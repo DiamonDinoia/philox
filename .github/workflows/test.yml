@@ -22,7 +22,7 @@ jobs:
         cxx: g++
         build-type: RelWithDebInfo
         # Extra options pass to cmake while configuring project
-        configure-options: -DTESTS=ON
+        configure-options: -DPHILOX_ENABLE_TESTS=ON
         run-test: true
         ctest-options: --test-dir tests  --output-on-failure
     - uses: DoozyX/clang-format-lint-action@v0.14

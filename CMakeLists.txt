@@ -42,6 +42,6 @@ add_library(philox INTERFACE)
 target_include_directories(philox INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(philox INTERFACE cxx_std_20) # This means at least C++20
 
-if(ENABLE_TESTS)
+if(PHILOX_ENABLE_TESTS)
     add_subdirectory(tests)
 endif()

@@ -14,7 +14,6 @@ set(TEST_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/include)
 
 file(MAKE_DIRECTORY ${TEST_INCLUDE_DIR})
 
-
 CPMAddPackage(
         NAME random123
         GITHUB_REPOSITORY DEShawResearch/random123
