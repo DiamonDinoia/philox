@@ -85,9 +85,15 @@ class Philox4x32_10 : protected philox {
    public:
     PHILOX_INLINE PHILOX_HOST_DEVICE constexpr explicit Philox4x32_10(
         philox::uint64_t seed_value = PHILOX4x32_DEFAULT_SEED, philox::uint64_t subsequence = 0,
-        philox::uint64_t offset = 0) {
+        philox::uint64_t offset = 0) noexcept {
         seed(seed_value, subsequence, offset);
     }
+
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10(const Philox4x32_10 &other) noexcept            = default;
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10(Philox4x32_10 &&other) noexcept                 = default;
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10 &operator=(const Philox4x32_10 &other) noexcept = default;
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10 &operator=(Philox4x32_10 &&other) noexcept      = default;
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr ~Philox4x32_10() noexcept                                     = default;
 
     PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void seed(philox::uint64_t       seed_value,
                                                          const philox::uint64_t subsequence,
@@ -97,7 +103,7 @@ class Philox4x32_10 : protected philox {
     }
 
     PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void restart(const philox::uint64_t subsequence,
-                                                            const philox::uint64_t offset) {
+                                                            const philox::uint64_t offset) noexcept {
         m_counter  = {0, 0, 0, 0};
         m_result   = {0, 0, 0, 0};
         m_substate = 0;
@@ -106,17 +112,17 @@ class Philox4x32_10 : protected philox {
         m_result = ten_rounds(m_counter, m_key);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard(philox::uint64_t offset) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard(philox::uint64_t offset) noexcept {
         discard_impl(offset);
         m_result = ten_rounds(m_counter, m_key);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_subsequence(philox::uint64_t subsequence) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_subsequence(philox::uint64_t subsequence) noexcept {
         discard_subsequence_impl(subsequence);
         m_result = ten_rounds(m_counter, m_key);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr philox::uint32_t next_32() {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr philox::uint32_t next_32() noexcept {
         const auto ret = m_result.data[m_substate++];
         if (m_substate == 4) {
             discard_state();
@@ -125,21 +131,21 @@ class Philox4x32_10 : protected philox {
         return ret;
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr philox::uint64_t next_64() {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr philox::uint64_t next_64() noexcept {
         return std::bit_cast<philox::uint64_t>(uint2{next_32(), next_32()});
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr philox::uint64_t operator()() { return next_64(); }
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr philox::uint64_t operator()() noexcept { return next_64(); }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr philox::uint64_t max() {
+    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr philox::uint64_t max() noexcept {
         return std::numeric_limits<philox::uint64_t>::max();
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr philox::uint64_t min() {
+    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr philox::uint64_t min() noexcept {
         return std::numeric_limits<philox::uint64_t>::min();
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr double uniform() {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr double uniform() noexcept {
         return static_cast<double>(operator()() >> 11) * 0x1.0p-53;
     }
 
@@ -171,16 +177,16 @@ class Philox4x32_10 : protected philox {
     uint2           m_key{};
     philox::uint8_t m_substate{};
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_subsequence_impl(philox::uint64_t subsequence) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_subsequence_impl(philox::uint64_t subsequence) noexcept {
         const auto [lo, hi] = toUint2(subsequence);
         const auto temp     = m_counter.z;
         m_counter.z += lo;
         m_counter.w += hi + (m_counter.z < temp);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_state() { bump_counter(); }
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_state() noexcept { bump_counter(); }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_state(philox::uint64_t offset) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_state(philox::uint64_t offset) noexcept {
         const auto [lo, hi] = toUint2(offset);
         const auto temp     = m_counter;
         m_counter.x += lo;
@@ -189,7 +195,7 @@ class Philox4x32_10 : protected philox {
         m_counter.w += (m_counter.z < temp.z);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_impl(philox::uint64_t offset) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void discard_impl(philox::uint64_t offset) noexcept {
         // Adjust offset for subset
         m_substate += offset & 3;
         philox::uint64_t counter_offset = offset >> 2;
@@ -199,18 +205,18 @@ class Philox4x32_10 : protected philox {
         discard_state(counter_offset);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void bump_counter() { m_counter.m128i++; }
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void bump_counter() noexcept { m_counter.m128i++; }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint2 toUint2(philox::uint64_t x) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint2 toUint2(philox::uint64_t x) noexcept {
         return std::bit_cast<uint2>(x);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint2 mulhilo32(philox::uint32_t x, philox::uint32_t y) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint2 mulhilo32(philox::uint32_t x, philox::uint32_t y) noexcept {
         auto xy = static_cast<philox::uint64_t>(x) * y;
         return toUint2(xy);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint2 bumpkey(uint2 key) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint2 bumpkey(uint2 key) noexcept {
         key.x += PHILOX_W32_0;
         key.y += PHILOX_W32_1;
         return key;
@@ -218,14 +224,14 @@ class Philox4x32_10 : protected philox {
 
     PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint4
 
-    single_round(const uint4 &counter, const uint2 &key) {
+    single_round(const uint4 &counter, const uint2 &key) noexcept {
         // Source: Random123
         const auto [lo0, hi0] = mulhilo32(PHILOX_M4x32_0, counter.x);
         const auto [lo1, hi1] = mulhilo32(PHILOX_M4x32_1, counter.z);
         return {hi1 ^ counter.y ^ key.x, lo1, hi0 ^ counter.w ^ key.y, lo0};
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint4 ten_rounds(uint4 counter, uint2 key) {
+    PHILOX_INLINE PHILOX_HOST_DEVICE static constexpr uint4 ten_rounds(uint4 counter, uint2 key) noexcept {
         counter = single_round(counter, key);
         key     = bumpkey(key);  // 1
         counter = single_round(counter, key);
