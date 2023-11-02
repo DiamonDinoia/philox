@@ -89,11 +89,36 @@ class Philox4x32_10 : protected philox {
         seed(seed_value, subsequence, offset);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10(const Philox4x32_10 &other) noexcept            = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10(Philox4x32_10 &&other) noexcept                 = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10 &operator=(const Philox4x32_10 &other) noexcept = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10 &operator=(Philox4x32_10 &&other) noexcept      = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr ~Philox4x32_10() noexcept                                     = default;
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10(const Philox4x32_10 &other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+    };
+
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10(Philox4x32_10 &&other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+    };
+
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10 &operator=(const Philox4x32_10 &other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+        return *this;
+    };
+
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr Philox4x32_10 &operator=(Philox4x32_10 &&other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+        return *this;
+    };
+    PHILOX_INLINE PHILOX_HOST_DEVICE constexpr ~Philox4x32_10() noexcept = default;
 
     PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void seed(philox::uint64_t       seed_value,
                                                          const philox::uint64_t subsequence,
@@ -127,6 +152,7 @@ class Philox4x32_10 : protected philox {
         if (m_substate == 4) {
             discard_state();
             m_result = ten_rounds(m_counter, m_key);
+            m_substate = 0;
         }
         return ret;
     }

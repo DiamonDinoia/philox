@@ -89,11 +89,34 @@ class Philox2x64_10 : protected philox {
         seed(seed_value, subsequence, offset);
     }
 
-    PHILOX_INLINE PHILOX_HOST_DEVICE                Philox2x64_10(const Philox2x64_10 &) noexcept = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE                Philox2x64_10(Philox2x64_10 &&) noexcept      = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE Philox2x64_10 &operator=(const Philox2x64_10 &) noexcept     = default;
-    PHILOX_INLINE PHILOX_HOST_DEVICE Philox2x64_10 &operator=(Philox2x64_10 &&) noexcept          = default;
-    PHILOX_INLINE                                   PHILOX_HOST_DEVICE ~Philox2x64_10() noexcept  = default;
+    PHILOX_INLINE PHILOX_HOST_DEVICE Philox2x64_10(const Philox2x64_10 &other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+    };
+    PHILOX_INLINE PHILOX_HOST_DEVICE Philox2x64_10(Philox2x64_10 &&other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+    };
+
+    PHILOX_INLINE PHILOX_HOST_DEVICE Philox2x64_10 &operator=(const Philox2x64_10 &other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+        return *this;
+    };
+    PHILOX_INLINE PHILOX_HOST_DEVICE Philox2x64_10 &operator=(Philox2x64_10 &&other) noexcept {
+        m_counter  = other.m_counter;
+        m_result   = other.m_result;
+        m_key      = other.m_key;
+        m_substate = other.m_substate;
+        return *this;
+    };
+    PHILOX_INLINE PHILOX_HOST_DEVICE ~Philox2x64_10() noexcept = default;
 
     PHILOX_INLINE PHILOX_HOST_DEVICE constexpr void seed(philox::uint64_t       seed_value,
                                                          const philox::uint64_t subsequence,
@@ -127,6 +150,7 @@ class Philox2x64_10 : protected philox {
         if (m_substate == 2) {
             discard_state();
             m_result = ten_rounds(m_counter, m_key);
+            m_substate = 0;
         }
         return ret;
     }
@@ -144,6 +168,7 @@ class Philox2x64_10 : protected philox {
     PHILOX_INLINE PHILOX_HOST_DEVICE constexpr double uniform() noexcept {
         return static_cast<double>(operator()() >> 11) * 0x1.0p-53;
     }
+
 
    protected:
     inline static constexpr philox::uint64_t PHILOX4x32_DEFAULT_SEED{0xdeadbeefdeadbeefULL};

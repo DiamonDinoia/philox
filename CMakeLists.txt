@@ -24,24 +24,15 @@ if (NOT (EXISTS ${CPM_DOWNLOAD_LOCATION}))
     file(DOWNLOAD
             https://github.com/TheLartians/CPM.cmake/releases/download/v${CPM_DOWNLOAD_VERSION}/CPM.cmake
             ${CPM_DOWNLOAD_LOCATION}
-            )
+    )
 endif ()
 include(${CPM_DOWNLOAD_LOCATION})
-
-
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_compile_options(-fstack-protector-all)
-    add_compile_options(-Wall -Wextra -pedantic -fno-omit-frame-pointer -g -O0 -Wno-gnu-zero-variadic-macro-arguments)
-endif ()
-if (CMAKE_BUILD_TYPE MATCHES Release)
-    add_compile_options(-O3)
-endif ()
 
 
 add_library(philox INTERFACE)
 target_include_directories(philox INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(philox INTERFACE cxx_std_20) # This means at least C++20
 
-if(PHILOX_ENABLE_TESTS)
+if (PHILOX_ENABLE_TESTS)
     add_subdirectory(tests)
-endif()
+endif ()
